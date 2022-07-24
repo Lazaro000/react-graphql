@@ -1,8 +1,8 @@
-import { useEffect } from "react";
 import reactLogo from "./assets/react.svg";
 import "./App.css";
 import { gql, useQuery } from "@apollo/client";
 import { Persons } from "./Persons";
+import { PersonForm } from "./PersonForm";
 
 const ALL_PERSONS = gql`
   query {
@@ -19,7 +19,9 @@ const ALL_PERSONS = gql`
 `;
 
 function App() {
-  const { data, loading, error } = useQuery(ALL_PERSONS);
+  const { data, loading, error } = useQuery(ALL_PERSONS, {
+    pollInterval: 2000,
+  });
 
   if (error) return <span style="color: red">{error}</span>;
 
@@ -39,6 +41,8 @@ function App() {
         ) : (
           <Persons persons={data?.allPersons}></Persons>
         )}
+
+        <PersonForm />
       </div>
     </div>
   );
