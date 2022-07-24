@@ -1,14 +1,21 @@
+import React, { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import "./App.css";
-import { useQuery } from "@apollo/client";
 import { Persons } from "./Persons";
 import { PersonForm } from "./PersonForm";
 import { usePersons } from "./persons/custom-hooks";
+import { Notify } from "./Notify";
 
 function App() {
   const { data, loading, error } = usePersons();
+  const [errorMessage, setErrorMessage] = useState(null);
 
   if (error) return <span style="color: red">{error}</span>;
+
+  const nofityError = (message) => {
+    setErrorMessage(message);
+    setTimeout(() => setErrorMessage(null), 5000);
+  };
 
   console.log(data);
 
@@ -27,7 +34,9 @@ function App() {
           <Persons persons={data?.allPersons}></Persons>
         )}
 
-        <PersonForm />
+        <PersonForm nofityError={nofityError} />
+
+        <Notify errorMessage={errorMessage} />
       </div>
     </div>
   );
