@@ -1,15 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useMutation } from "@apollo/client";
 import { ALL_PERSONS } from "./persons/graphql-queries";
 import { EDIT_NUMBER } from "./persons/graphql-mutations";
 
-export const PhoneForm = () => {
+export const PhoneForm = ({ notifyError }) => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
 
-  const [changeNumber] = useMutation(EDIT_NUMBER, {
+  const [changeNumber, result] = useMutation(EDIT_NUMBER, {
     refetchQueries: [{ query: ALL_PERSONS }],
   });
+
+  useEffect(() => {
+    if (result.data && result.data.editNumber === null) {
+      notifyError("Person not found");
+      console.error("Person not found");
+    }
+  }, [result.data]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

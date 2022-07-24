@@ -13,7 +13,7 @@ function App() {
 
   if (error) return <span style="color: red">{error}</span>;
 
-  const nofityError = (message) => {
+  const notifyError = (message) => {
     setErrorMessage(message);
     setTimeout(() => setErrorMessage(null), 5000);
   };
@@ -35,8 +35,8 @@ function App() {
           <Persons persons={data?.allPersons}></Persons>
         )}
 
-        <PersonForm nofityError={nofityError} />
-        <PhoneForm />
+        <PersonForm notifyError={notifyError} />
+        <PhoneForm notifyError={notifyError} />
 
         <Notify errorMessage={errorMessage} />
       </div>
