@@ -8,7 +8,8 @@ import { Notify } from "./Notify";
 import { PhoneForm } from "./PhoneForm";
 import { LoginForm } from "./LoginForm";
 import { ALL_PERSONS } from "./persons/graphql-queries";
-import { useApolloClient } from "@apollo/client";
+import { useApolloClient, useSubscription } from "@apollo/client";
+import { PERSON_ADDED } from "./persons/graphql-subscriptions";
 
 function App() {
   // ! Mala práctica usar el client de apollo en los componentes
@@ -19,6 +20,14 @@ function App() {
     () => !!localStorage.getItem("phonenumbers-user-token")
   );
   const apollo_client = useApolloClient();
+
+  useSubscription(PERSON_ADDED, {
+    onSubscriptionData: ({ subscriptionData }) => {
+      console.log({ subscriptionData });
+
+      const { addedPerson } = subscriptionData.data;
+    },
+  });
 
   // ! Mala práctica usar el client de apollo en los componentes
   // ? Se debería usar en un customHook
