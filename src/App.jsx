@@ -7,13 +7,19 @@ import { usePersons } from "./persons/custom-hooks";
 import { Notify } from "./Notify";
 import { PhoneForm } from "./PhoneForm";
 import { LoginForm } from "./LoginForm";
+import { ALL_PERSONS } from "./persons/graphql-queries";
 
 function App() {
-  const { data, loading, error } = usePersons();
+  const { client, data, loading, error } = usePersons();
   const [errorMessage, setErrorMessage] = useState(null);
   const [token, setToken] = useState(
     () => !!localStorage.getItem("phonenumbers-user-token")
   );
+
+  const results = client.readQuery({
+    query: ALL_PERSONS,
+  });
+  console.log("Cache", results);
 
   if (error) return <span style="color: red">{error}</span>;
 
