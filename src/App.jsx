@@ -11,6 +11,29 @@ import { ALL_PERSONS } from "./persons/graphql-queries";
 import { useApolloClient, useSubscription } from "@apollo/client";
 import { PERSON_ADDED } from "./persons/graphql-subscriptions";
 
+// TODO Pasar esto a un customHook en otro archivo separado del componente
+const useSubscriptions = () => {
+  const client = useApolloClient();
+
+  useSubscription(PERSON_ADDED, {
+    onSubscriptionData: ({ subscriptionData }) => {
+      const { personAdded } = subscriptionData.data;
+
+      const dataInStore = client.readQuery({ query: ALL_PERSONS });
+
+      client.writeQuery({
+        query: ALL_PERSONS,
+        data: {
+          ...dataInStore,
+          allPersons: [...dataInStore.allPersons, personAdded],
+        },
+      });
+    },
+  });
+
+  return client;
+};
+
 function App() {
   // ! Mala práctica usar el client de apollo en los componentes
   // ? Se debería usar en un customHook
@@ -19,15 +42,7 @@ function App() {
   const [token, setToken] = useState(
     () => !!localStorage.getItem("phonenumbers-user-token")
   );
-  const apollo_client = useApolloClient();
-
-  useSubscription(PERSON_ADDED, {
-    onSubscriptionData: ({ subscriptionData }) => {
-      console.log({ subscriptionData });
-
-      const { addedPerson } = subscriptionData.data;
-    },
-  });
+  const apollo_client = useSubscriptions();
 
   // ! Mala práctica usar el client de apollo en los componentes
   // ? Se debería usar en un customHook
