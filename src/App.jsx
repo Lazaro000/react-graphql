@@ -8,14 +8,20 @@ import { Notify } from "./Notify";
 import { PhoneForm } from "./PhoneForm";
 import { LoginForm } from "./LoginForm";
 import { ALL_PERSONS } from "./persons/graphql-queries";
+import { useApolloClient } from "@apollo/client";
 
 function App() {
+  // ! Mala práctica usar el client de apollo en los componentes
+  // ? Se debería usar en un customHook
   const { client, data, loading, error } = usePersons();
   const [errorMessage, setErrorMessage] = useState(null);
   const [token, setToken] = useState(
     () => !!localStorage.getItem("phonenumbers-user-token")
   );
+  const apollo_client = useApolloClient();
 
+  // ! Mala práctica usar el client de apollo en los componentes
+  // ? Se debería usar en un customHook
   const results = client.readQuery({
     query: ALL_PERSONS,
   });
@@ -28,7 +34,11 @@ function App() {
     setTimeout(() => setErrorMessage(null), 5000);
   };
 
-  console.log(data);
+  const logout = () => {
+    setToken(null);
+    localStorage.clear();
+    apollo_client.resetStore();
+  };
 
   return (
     <div className="App">
@@ -45,7 +55,11 @@ function App() {
           <Persons persons={data?.allPersons}></Persons>
         )}
 
-        {!token && <LoginForm notifyError={notifyError} setToken={setToken} />}
+        {token ? (
+          <button onClick={logout}>Cerrar sesión</button>
+        ) : (
+          <LoginForm notifyError={notifyError} setToken={setToken} />
+        )}
         <PersonForm notifyError={notifyError} />
         <PhoneForm notifyError={notifyError} />
 
